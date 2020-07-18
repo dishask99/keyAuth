@@ -6,10 +6,10 @@ function createCaptcha() {
   //clear the contents of captcha div first 
   document.getElementById('captcha').innerHTML = "";
   var charsArray = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@!#$%^&*";
-  var lengthOtp = 5;
+  var lengthOtp = 15;
   var captcha = [];
   for (var i = 0; i < lengthOtp; i++) {
-    //below code will not allow Repetition of Characters
+    //below code will allow Repetition of Characters
     var index = Math.floor(Math.random() * charsArray.length + 1); //get the next character from the array
     //if (captcha.indexOf(charsArray[index]) == -1)
     captcha.push(charsArray[index]);
@@ -33,22 +33,24 @@ var stringEnter = document.querySelector('h1');
 
 form.addEventListener("submit", validateCaptcha);
 
+//----------------------------------------------------------------------------------------------------------------------------------------
 // Add the event paramater to the function
 function validateCaptcha(event) {
   event.preventDefault();
 
   if (document.getElementById("cpatchaTextBox").value == code) {
-    console.log("object", history);
+   // console.log("object", history);
     const data = getFeatures();
-
+    //console.log(data);
+    console.log(JSON.stringify(data));
     (async () => {
-      const rawResponse = await fetch("http://localhost:3000/store", {
+      const rawResponse = await fetch("http://127.0.0.1:3000/store", {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(data)
+        body: JSON.stringify({data})
       });
       const content = await rawResponse.json();
 
@@ -82,10 +84,14 @@ function reset() {
   history.stack=[];
 }
 
+
+//--------------------------------------------------------------------------------------------------------------------
+
+
 function getFeatures() {
-  var obj=[];
-  var j=0;
-  var obj = {};
+  var obj1=[]; var j=0;
+  //obj1.arr = 
+  var obj = {}; stringFeatures="";
   obj.arr = history.get();
   obj.seekArr = history.get_seek();
   obj.pressArr = history.get_press();
@@ -123,15 +129,28 @@ function getFeatures() {
     delete obj.arr[i][0];
     delete obj.arr[i][1];
     delete obj.arr[i][2];
-    obj.arr[i][0] = rev;
-    obj.arr[i][1] = seekMean;
-    obj.arr[i][2] = pressMean;
-    obj.arr[i][3] = postMean;
-    obj.arr[i][4] = seekSd;
-    obj.arr[i][5] = pressSd;
-    obj.arr[i][6] = postSd;
+   if(rev || seekMean || pressMean || postMean || seekSd || pressSd || postSd)
+       {  //obj1[j] = new Array(7);
+          obj1[j] = new Array(7);
+          obj1[j][0] = rev;
+          obj1[j][1] = (seekMean)?seekMean:0;
+          obj1[j][2] = (pressMean)?pressMean:0;
+          obj1[j][3] = (postMean)?postMean:0;
+          obj1[j][4] = (seekSd)?seekSd:0;
+          obj1[j][5] = (pressSd)?pressSd:0;
+          obj1[j][6] = (postSd)?postSd:0;
+            j++;
+        // var result = obj1[j].toString();
+        // console.log(result);
+        // if(stringFeatures== "")
+        //   stringFeatures = stringFeatures + result;
+        // else
+        // stringFeatures = stringFeatures + ",," + result;
+       
+    }
   }
-  return obj;
+  //return stringFeatures;
+   return obj1;
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -160,6 +179,7 @@ var z = 0.0000001;
 keyCodes = [65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 32, 222, 188, 190, 186, 187, 189, 191, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57];
 keyCodesObj = { 65: 1, 66: 1, 67: 1, 68: 1, 69: 1, 70: 1, 71: 1, 72: 1, 73: 1, 74: 1, 75: 1, 76: 1, 77: 1, 78: 1, 79: 1, 80: 1, 81: 1, 82: 1, 83: 1, 84: 1, 85: 1, 86: 1, 87: 1, 88: 1, 89: 1, 90: 1, 32: 1, 222: 1, 188: 1, 190: 1, 186: 1, 187: 1, 189: 1, 191: 1, 48: 1, 49: 1, 50: 1, 51: 1, 52: 1, 53: 1, 54: 1, 55: 1, 56: 1, 57: 1 }
 
+//*****************************************************************
 //keydown function
 $('#cpatchaTextBox').keydown(e => {
   if (e.keyCode != 16) {
@@ -174,6 +194,8 @@ $('#cpatchaTextBox').keydown(e => {
   }
 });
 
+
+//*****************************************************************
 //keyup function
 var arr;
 $('#cpatchaTextBox').keyup(e => {
@@ -192,6 +214,8 @@ $('#cpatchaTextBox').keyup(e => {
   wfk[keycode] = 0;
 });
 
+
+//*****************************************************************
 // to store keystroke data collected above in usable form
 //console.log(obj);
 history = {};
@@ -220,9 +244,10 @@ history.get = function () {
   return histStackObject;
 }
 
+//*****************************************************************
 history.add = function (arr) {
   this.stack.push(arr);
-  this.get();
+  //this.get();
 }
 
 history.get_seek = function () {

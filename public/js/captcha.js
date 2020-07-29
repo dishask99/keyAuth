@@ -8,7 +8,7 @@ function createCaptcha() {
   document.getElementById('captcha').innerHTML = "";
   document.getElementById("cpatchaTextBox").value ="";
   var charsArray = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@!#$%^&*";
-  var lengthOtp = 5;
+  var lengthOtp = 15;
   var captcha = [];
   for (var i = 0; i < lengthOtp; i++) {
     //below code will not allow Repetition of Characters

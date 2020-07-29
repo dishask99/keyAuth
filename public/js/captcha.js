@@ -1,17 +1,19 @@
 //Captcha Code
 //--------------------------------------------------------------------------------------------------------------------------
 var code;
-var stringNo = 1;
+var stringNo;
+var user;
 function createCaptcha() {
-  //clear the contents of captcha div first 
+  //clear the contents of captcha div first
   document.getElementById('captcha').innerHTML = "";
+  document.getElementById("cpatchaTextBox").value ="";
   var charsArray = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@!#$%^&*";
   var lengthOtp = 5;
   var captcha = [];
   for (var i = 0; i < lengthOtp; i++) {
     //below code will not allow Repetition of Characters
     var index = Math.floor(Math.random() * charsArray.length + 1); //get the next character from the array
-    //if (captcha.indexOf(charsArray[index]) == -1)
+    //if (captcha.indexOf(charsArray[index])0 == -1)
     captcha.push(charsArray[index]);
     //else i--;
   }
@@ -42,7 +44,7 @@ function validateCaptcha(event) {
     const data = getFeatures();
 
     (async () => {
-      const rawResponse = await fetch("http://localhost:3000/store", {
+      const rawResponse = await fetch("http://127.0.0.1:3000/store", {
         method: 'POST',
         headers: {
           'Accept': 'application/json',
@@ -55,19 +57,12 @@ function validateCaptcha(event) {
       console.log(content);
     })();
 
-    if(stringNo === 3){
-      form.submit();
-    }
-    stringNo = stringNo + 1;
-    stringEnter.innerHTML = "Session " + stringNo;
-    document.getElementById("cpatchaTextBox").value ="";
 
-    if (stringNo <= 3) {
-      reset();
-      createCaptcha();
-    } else {
-      form.submit();
-    }
+
+
+
+    form.submit();
+
   } else {
     reset();
     createCaptcha();
@@ -214,6 +209,10 @@ history.get = function () {
         histStackObject[prevKeyCode][2].push(seekTime);
       }
       histStackObject[keyCode][1].push(pressTime);
+      console.log("hello : ");
+      console.log(histStackObject[keyCode][0]);
+      console.log(histStackObject[keyCode][1]);
+      console.log(histStackObject[keyCode][2]);
     }
   }
 

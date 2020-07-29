@@ -126,52 +126,65 @@ app.post("/store", isloggedin, function (req, res) {
 });
 
 app.post("/keystrokeAnalysis", isloggedin, function (req, res) {
-
+     const timesCaptchaFilled = req.user.timesCaptchaFilled;
      const sessionNumber = req.user.sessionNumber;
-     User.findByIdAndUpdate(req.user._id, { enrolledAt: new Date(), sessionNumber: sessionNumber + 1 }, (err) => {
-          if (err) {
-               console.log(err);
-          }
-          else {
-               console.log("success");
-          }
-     });
-
-     var id = req.user.email;
-     console.log(id);
-
-     let date = new Date(new Date().getTime() + 60 * 60 * 24 * 1000);
-     //let date = new Date(2020,6,10,14,22);
-     /*let date = new Date();
-     date.setSeconds(date.getSeconds()+30);*/
-     var transporter = nodemailer.createTransport({
-          service: 'Gmail',
-          auth: {
-               user: "gouravagg77@gmail.com",
-               pass: "Gourav123!"
-          }
-     });
-
-     var mailOptions = {
-          to: req.user.email,
-          from: "gouravagg77@gmail.com",
-          subject: "Enrolment Time",
-          text: "Hello, You can enrol now by clicking on the link below: ",
-     };
-
-     var j = schedule.scheduleJob(date, function () {
-          transporter.sendMail(mailOptions, function (error, info) {
-               if (error) {
-                    console.log(error);
-               } else {
-                    console.log("email send");
+     if(timesCaptchaFilled<3){
+          User.findByIdAndUpdate(req.user.id,{timesCaptchaFilled: timesCaptchaFilled+1},(err)=>{
+               if(err){
+                    console.log(err);
+               }else{
+                    console.log("captcha filled "+req.user.timesCaptchaFilled+" times.");
                }
           });
-     });
+          res.redirect("/keystrokeAnalysis");
+     }else {
+          User.findByIdAndUpdate(req.user._id, {
+               enrolledAt: new Date(),
+               sessionNumber: sessionNumber + 1,
+               timesCaptchaFilled: 1
+          }, (err) => {
+               if (err) {
+                    console.log(err);
+               } else {
+                    console.log("success");
+               }
+          });
 
-     req.flash("success", "Enrolment Done");
-     res.redirect("/");
+          var id = req.user.email;
+          console.log(id);
 
+          let date = new Date(new Date().getTime() + 60 * 60 * 24 * 1000);
+          //let date = new Date(2020,6,10,14,22);
+          /*let date = new Date();
+          date.setSeconds(date.getSeconds()+30);*/
+          var transporter = nodemailer.createTransport({
+               service: 'Gmail',
+               auth: {
+                    user: "gouravagg77@gmail.com",
+                    pass: "Gourav123!"
+               }
+          });
+
+          var mailOptions = {
+               to: req.user.email,
+               from: "gouravagg77@gmail.com",
+               subject: "Enrolment Time",
+               text: "Hello, You can enrol now by clicking on the link below: ",
+          };
+
+          var j = schedule.scheduleJob(date, function () {
+               transporter.sendMail(mailOptions, function (error, info) {
+                    if (error) {
+                         console.log(error);
+                    } else {
+                         console.log("email send");
+                    }
+               });
+          });
+
+          req.flash("success", "Enrolment Done");
+          res.redirect("/");
+     }
 });
 
 // AUTHENTICATION ROUTES
@@ -184,7 +197,7 @@ app.get("/register", function (req, res) {
 var host;
 app.post("/register", function (req, res) {
 
-     var newUser = new User({ username: req.body.username, email: req.body.email, enrolledAt: new Date(), sessionNumber: 1, verified: false });
+     var newUser = new User({ username: req.body.username, email: req.body.email, enrolledAt: new Date(), sessionNumber: 1, verified: false,timesCaptchaFilled: 1});
      User.register(newUser, req.body.password, function (err, user) {
           if (err) {
                req.flash("error", err.message);

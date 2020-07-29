@@ -7,7 +7,8 @@ var userSchema = new mongoose.Schema({
     password: String,
     enrolledAt: Date,
     sessionNumber: Number,
-    verified: Boolean
+    verified: Boolean,
+    timesCaptchaFilled: Number
 });
 
 

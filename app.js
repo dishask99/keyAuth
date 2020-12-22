@@ -11,6 +11,12 @@ var express = require("express"),
      Features = require("./models/features"),
      nodemailer = require("nodemailer"),
      schedule = require("node-schedule");
+const dotenv = require('dotenv');
+const result = dotenv.config();
+if (result.error) {
+  throw result.error;
+}
+const { parsed: envs } = result;
 
 //APP CONFIGURATION
 mongoose.connect("mongodb://localhost/Dummy_site", {
@@ -56,8 +62,8 @@ app.get("/keystrokeAnalysis", isloggedin, function (req, res) {
           var smtpTransport = nodemailer.createTransport({
                service: 'Gmail',
                auth: {
-                    user: "gouravagg77@gmail.com",
-                    pass: "Gourav123!"
+                    user: envs.GID,
+                    pass: envs.GPASS
                }
           });
 
@@ -66,7 +72,7 @@ app.get("/keystrokeAnalysis", isloggedin, function (req, res) {
 
           var mailOptions = {
                to: req.user.email,
-               from: "gouravagg77@gmail.com",
+               from: envs.GID,
                subject: "Registration Successful",
                html: "Hello,<br> Please Click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>",
           };
@@ -96,6 +102,8 @@ app.get("/keystrokeAnalysis", isloggedin, function (req, res) {
 app.post("/store", isloggedin, function (req, res) {
 
      const data = req.body;
+     console.log("heello");
+     console.log(data);
      if (!req.body) {
           return res.status(400).json({
                status: 'error',
@@ -109,7 +117,7 @@ app.post("/store", isloggedin, function (req, res) {
      });
 
      const newRow = {
-          features: req.body.a,
+          features: req.body,
           author: {
                id: req.user._id,
                username: req.user.username
@@ -160,14 +168,14 @@ app.post("/keystrokeAnalysis", isloggedin, function (req, res) {
           var transporter = nodemailer.createTransport({
                service: 'Gmail',
                auth: {
-                    user: "gouravagg77@gmail.com",
-                    pass: "Gourav123!"
+                    user: envs.GID,
+                    pass: envs.GPASS
                }
           });
 
           var mailOptions = {
                to: req.user.email,
-               from: "gouravagg77@gmail.com",
+               from: envs.GID,
                subject: "Enrolment Time",
                text: "Hello, You can enrol now by clicking on the link below: ",
           };
@@ -198,6 +206,7 @@ var host;
 app.post("/register", function (req, res) {
 
      var newUser = new User({ username: req.body.username, email: req.body.email, enrolledAt: new Date(), sessionNumber: 1, verified: false,timesCaptchaFilled: 1});
+     console.log(newUser);
      User.register(newUser, req.body.password, function (err, user) {
           if (err) {
                req.flash("error", err.message);
@@ -207,8 +216,8 @@ app.post("/register", function (req, res) {
                     var smtpTransport = nodemailer.createTransport({
                          service: 'Gmail',
                          auth: {
-                              user: "gouravagg77@gmail.com",
-                              pass: "Gourav123!"
+                              user: envs.GID,
+                              pass: envs.GPASS
                          }
                     });
 
@@ -219,7 +228,7 @@ app.post("/register", function (req, res) {
 
                     var mailOptions = {
                          to: req.user.email,
-                         from: "gouravagg77@gmail.com",
+                         from: envs.GID,
                          subject: "Registration Successful",
                          html: "Hello,<br> Please Click on the link to verify your email.<br><a href=" + link + ">Click here to verify</a>",
                     };

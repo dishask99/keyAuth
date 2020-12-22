@@ -7,8 +7,8 @@ function createCaptcha() {
   //clear the contents of captcha div first
   document.getElementById('captcha').innerHTML = "";
   document.getElementById("cpatchaTextBox").value ="";
-  var charsArray = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ@!#$%^&*";
-  var lengthOtp = 15;
+  var charsArray = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+  var lengthOtp = 25;
   var captcha = [];
   for (var i = 0; i < lengthOtp; i++) {
     //below code will not allow Repetition of Characters
@@ -42,7 +42,8 @@ function validateCaptcha(event) {
   if (document.getElementById("cpatchaTextBox").value == code) {
     console.log("object", history);
     const data = getFeatures();
-
+    console.log("yeesss : ");
+    console.log(data);
     (async () => {
       const rawResponse = await fetch("http://127.0.0.1:3000/store", {
         method: 'POST',
@@ -81,13 +82,14 @@ function getFeatures() {
   var obj=[];
   var j=0;
   var obj = {};
+  var data = [];
   obj.arr = history.get();
   obj.seekArr = history.get_seek();
   obj.pressArr = history.get_press();
   var histSkt = fo(obj.seekArr);
   var histPrt = fo(obj.pressArr);
-  var hist_prt_len = histSkt.length;
-  var hist_skt_len = histPrt.length;
+  var hist_prt_len = histPrt.length;
+  var hist_skt_len = histSkt.length;
   var pressHistMean = round(avg(histPrt));
   var seekHistMean = round(avg(histSkt));
   var pressHistSd = round(standard_dev(histPrt));
@@ -125,8 +127,12 @@ function getFeatures() {
     obj.arr[i][4] = seekSd;
     obj.arr[i][5] = pressSd;
     obj.arr[i][6] = postSd;
+    obj.arr[i][7] = i;
+    data.push(obj.arr[i]);
   }
-  return obj;
+  console.log("ohh No");
+  console.log(data);
+  return data;
 }
 
 //--------------------------------------------------------------------------------------------------------------
@@ -229,6 +235,8 @@ history.get_seek = function () {
   for (i in this.stack) {
     seekArr.push(this.stack[i][1]);
   }
+  console.log("hell yeah : ");
+  console.log(seekArr);
   return seekArr;
 }
 
@@ -267,6 +275,9 @@ var fo = function (arr) {
 var avg = function (arr) {
   var len = arr.length;
   var sum = 0;
+  if(len == 0 ){
+    return 0;
+  }
   for (var i = 0; i < len; i++) {
     sum += arr[i];
   }

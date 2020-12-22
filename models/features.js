@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 
 var featureSchema = new mongoose.Schema({
-    features: [Number],
+    features: [[Number], [Number], [Number], [Number], [Number], [Number], [String]],
     author: {
         id: {
             type: mongoose.Schema.Types.ObjectId,
